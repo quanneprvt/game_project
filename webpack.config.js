@@ -12,7 +12,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-          title: 'Development'
+          title: 'game_project'
         }),
         new CopyPlugin([
             { from: 'src/assets', to: 'assets' },

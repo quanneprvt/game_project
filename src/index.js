@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import './css/style.css';
-import assets from './assets/bunny.png';
-// import * as PIXI from 'pixi.js'
-global.PIXI = require('pixi.js');
+import * as PIXI from 'pixi.js';
+global.PIXI = PIXI;
+
+const Overwrite = require('./game/Overwrite');
 const GameMgr = require('./game/GameMgr');
 
 function component() {
