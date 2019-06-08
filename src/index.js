@@ -5,6 +5,7 @@ global.PIXI = PIXI;
 
 const Overwrite = require('./game/Overwrite');
 const GameMgr = require('./game/GameMgr');
+global.APP = GameMgr;
 
 function component() {
     const element = document.createElement('div');

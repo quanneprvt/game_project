@@ -5,7 +5,9 @@ class GameMgr extends PIXI.Application
     constructor()
     {
         super();
-        this.renderer.resize(1000,600);
+        this.width = 1000;
+        this.height = 600;
+        this.renderer.resize(this.width, this.height);
         this.loader
             .add('bunny','assets/bunny.png')
             .add('button', 'assets/button.png')
@@ -45,6 +47,21 @@ class GameMgr extends PIXI.Application
         {
             this.Game[i].Update(dt);
         }
+    }
+
+    GetWidth()
+    {
+        return this.width;
+    }
+
+    GetHeight()
+    {
+        return this.height;
+    }
+
+    IsLandscape()
+    {
+        return this.height/this.width > 1;
     }
 }
 
