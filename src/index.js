@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import './css/style.css';
+import './core/Utils';
 import * as PIXI from 'pixi.js';
 global.PIXI = PIXI;
-
-const Overwrite = require('./game/Overwrite');
+const Overwrite = require('./core/Overwrite');
 const GameMgr = require('./game/GameMgr');
 global.APP = GameMgr;
 

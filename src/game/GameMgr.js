@@ -34,11 +34,6 @@ class GameMgr extends PIXI.Application
             // each frame we spin the bunny around a bit
             this.Update(deltaTime);
         });
-
-        // this.stage.interactive = true;
-        // this.stage.hitArea = new PIXI.Rectangle(0,0,1000,600);
-        // this.stage.on('pointerdown', this.TouchHandler.bind(this));
-        // this.stage.on('pointerup', this.TouchHandler.bind(this));
     }
 
     Update(dt)

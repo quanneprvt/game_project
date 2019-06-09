@@ -34,7 +34,7 @@ class GameOne extends PIXI.Container
     Update(dt)
     {
         // console.log('Updating ' + dt);
-        this.sortChildren();
+        // this.sortChildren();
     }
 
     AddGUI()
@@ -79,6 +79,11 @@ class GameOne extends PIXI.Container
         this.exportBtn.x = this.rmAllPoint.x + this.drawBtn.width;
         this.exportBtn.on('pointerdown', this.TouchHandler.bind(this));
 
+        this.drawBezier = new PIXI.Sprite(Resources.button.texture);
+        this.drawBezier.SetTouchable(true);
+        this.drawBezier.x = this.exportBtn.x + this.drawBtn.width;
+        this.drawBezier.on('pointerdown', this.TouchHandler.bind(this));
+
         this.fullScr = new PIXI.Sprite(Resources.button.texture);
         this.fullScr.SetTouchable(true);
         this.fullScr.y = this.fullScr.y + this.drawBtn.height;
@@ -96,10 +101,11 @@ class GameOne extends PIXI.Container
         this.AddText(this.rmAllPoint, 'Remove All', style)
         this.AddText(this.exportBtn, 'Export Vertices', style)
         this.AddText(this.fullScr, 'Full Sprite', style)
+        this.AddText(this.drawBezier, 'Draw Bezier', style)
 
         this.gui = [this.scaleUpBtn,this.scaleDownBtn, this.lockMoveBtn, this.drawBtn, 
                     this.rmPointBtn, this.rmAllPoint, this.exportBtn, this.coordText,
-                    this.fullScr];
+                    this.drawBezier,this.fullScr];
     }
 
     AddText(obj,text,style)
@@ -119,6 +125,17 @@ class GameOne extends PIXI.Container
             point.x +=dX;
             point.y +=dY;
         }
+    }
+
+    _DrawPointOnMap(x,y, type)
+    {
+        let graph = Utils.DrawCircle(0,0,4);
+        graph.on('pointerdown', this.TouchHandler.bind(this));
+        graph.interactive = true;
+        graph.position.set(x, y);
+        graph.pointType = type;
+        this.background.addChild(graph);
+        this.points.push(graph);
     }
 
     //button handler
@@ -150,9 +167,9 @@ class GameOne extends PIXI.Container
                     break;
 
                     case this.drawBtn:
-                        this.canDraw = !this.canDraw;
+                        this.canDraw = (this.canDraw == 'normal') ? false : 'normal';
                         this.drawBtn.text.text = this.canDraw ? 'Lock Draw' : 'Unlock Draw';
-                        this.setChildIndex(this.background, this.canDraw);
+                        this.setChildIndex(this.background, (this.canDraw == 'normal') ? true : false);
                     break;
 
                     case this.sprite:
@@ -162,16 +179,40 @@ class GameOne extends PIXI.Container
                     break;
 
                     case this.background:
-                        if (this.canDraw)
+                        switch (this.canDraw)
                         {
-                            let graph = new PIXI.Graphics();
-                            graph   .beginFill(0xffffff, 1)
-                                    .drawCircle(0, 0, 4)
-                                    .on('pointerdown', this.TouchHandler.bind(this))
-                                    .interactive = true;
-                            graph.position.set(e.data.global.x, e.data.global.y);
-                            this.background.addChild(graph);
-                            this.points.push(graph);
+                            case 'normal':
+                                this._DrawPointOnMap(e.data.global.x, e.data.global.y, 'normal');
+                            break;
+
+                            case 'bezier':
+                                if (this.tempP1)
+                                {
+                                    this.tempP2 = {x: e.data.global.x, y: e.data.global.y}
+                                    this._DrawPointOnMap(this.tempP2.x, this.tempP2.y, 'bezier');
+                                    const dist = Utils.Distance2Point(this.tempP1, this.tempP2);
+                                    const angle = Utils.Angle2Point(this.tempP1, this.tempP2);
+                                    let controlA = {x: this.tempP1.x + Math.cos(angle)*dist/3,
+                                                    y: this.tempP1.y + Math.sin(angle)*dist/3};
+                                    let controlB = {x: this.tempP1.x + Math.cos(angle)*2*dist/3,
+                                                    y: this.tempP1.y + Math.sin(angle)*2*dist/3};
+                                    this._DrawPointOnMap(controlA.x, controlA.y, 'bezier');
+                                    this._DrawPointOnMap(controlB.x, controlB.y, 'bezier');
+                                    let bezier = Utils.DrawBezier([this.tempP1,controlA,controlB,this.tempP2]);
+                                    bezier.position.set(this.tempP1.x, this.tempP1.y);
+                                    this.points.push(bezier);
+                                    this.background.addChild(bezier);
+                                    console.log(bezier);
+                                    this.tempP1 = null;
+                                    this.tempP2 = null;
+                                    console.log(dist);
+                                }
+                                else
+                                {
+                                    this.tempP1 = {x: e.data.global.x, y: e.data.global.y};
+                                    this._DrawPointOnMap(this.tempP1.x, this.tempP1.y,'bezier');
+                                }
+                            break;
                         }
                     break;
 
@@ -184,8 +225,16 @@ class GameOne extends PIXI.Container
                     break;
 
                     case this.rmAllPoint:
+                        this.tempP1 = null;
+                        this.tempP2 = null;
                         this.background.removeChildren();
                         this.points = [];
+                    break;
+
+                    case this.drawBezier:
+                        this.canDraw = (this.canDraw == 'bezier') ? false : 'bezier';
+                        this.drawBezier.text.text = this.canDraw ? 'Lock DrawB' : 'Unlock DrawB';
+                        this.setChildIndex(this.background, (this.canDraw == 'bezier') ? true : false);
                     break;
 
                     case this.exportBtn:
