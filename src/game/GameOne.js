@@ -10,26 +10,27 @@ class GameOne extends PIXI.Container
     Init()
     {
         console.log('Game One Init');
+        this.interactive = true;
         this.points = [];
         this.sprite = new PIXI.Sprite(Resources.bunny.texture);
         this.sprite.anchor.set(0.5,0.5);
-        this.background = new PIXI.Container();
-        this.background.interactive = true;
-        this.background.hitArea = new PIXI.Rectangle(0,0,APP.GetWidth(), APP.GetHeight());
+        this.foreground = new PIXI.Container();
+        // this.foreground.interactive = true;
+        this.foreground.hitArea = new PIXI.Rectangle(0,0,APP.GetWidth(), APP.GetHeight());
 
         this.sprite.position.set(200, 200);
         this.sprite.interactive = true;
 
         this.sprite.on('pointerdown', this.TouchHandler.bind(this));
-        this.sprite.on('pointermove', this.TouchHandler.bind(this));
-        this.sprite.on('pointerup', this.TouchHandler.bind(this));
-        this.background.on('pointerdown', this.TouchHandler.bind(this));
+        this.foreground.on('pointerdown', this.TouchHandler.bind(this));
+        this.on('pointermove', this.TouchHandler.bind(this));
+        this.on('pointerup', this.TouchHandler.bind(this));
 
         this.lockMove = false;
         this.AddGUI();
 
-        this.addChild(this.background);
         this.addChild(this.sprite);
+        this.addChild(this.foreground);
         this.addChild(...this.gui);
     }
 
@@ -140,11 +141,76 @@ class GameOne extends PIXI.Container
     {
         let graph = Utils.DrawCircle(0,0,4);
         graph.on('pointerdown', this.TouchHandler.bind(this));
+        graph.on('pointerup', this.TouchHandler.bind(this));
         graph.interactive = true;
         graph.position.set(x, y);
         graph.pointType = type;
-        this.background.addChild(graph);
+        this.foreground.addChild(graph);
         this.points.push(graph);
+    }
+
+    _GetControlPoint(p1, p2)
+    {
+        const dist = Utils.Distance2Point(p1, p2);
+        const angle = Utils.Angle2Point(p1, p2);
+        let controlA = {x: p1.x + Math.cos(angle)*dist/3,
+                        y: p1.y + Math.sin(angle)*dist/3};
+        let controlB = {x: p1.x + Math.cos(angle)*2*dist/3,
+                        y: p1.y + Math.sin(angle)*2*dist/3};
+
+        return [controlA, controlB];
+    }
+
+    _ResetTempValue()
+    {
+        this.tempBezier = null;
+        this.tempP1 = null;
+        this.tempP2 = null;
+    }
+
+    _ToggleDrawPoint()
+    {
+        this.canDraw = (this.canDraw == 'normal') ? false : 'normal';
+        this.drawBtn.text.text = this.canDraw ? 'Lock Draw' : 'Unlock Draw';
+    }
+
+    _ToggleDrawBezier()
+    {
+        this.canDraw = (this.canDraw == 'bezier') ? false : 'bezier';
+        this.drawBezier.text.text = this.canDraw ? 'Lock DrawB' : 'Unlock DrawB';
+        this._ResetTempValue();
+    }
+
+    _ToggleDraw(t)
+    {
+        switch (t)
+        {
+            case this.drawBtn:
+                if (this.canDraw != 'normal' && this.canDraw)
+                    this._ToggleDrawBezier();
+                this._ToggleDrawPoint();
+            break;
+
+            case this.drawBezier:
+                if (this.canDraw != 'bezier' && this.canDraw)
+                    this._ToggleDrawPoint();
+                this._ToggleDrawBezier();
+            break;
+        }
+        this.foreground.interactive = !this.canDraw ? false : true;
+    }
+
+    _SetCurrentPoint(p)
+    {
+        this.selectedPoint = p;
+        this.rmPointBtn.visible = true;
+    }
+
+    _SetStartPoint(p)
+    {
+        this.startX = p.x;
+        this.startY = p.y;
+        console.log(this.startX)
     }
 
     //button handler
@@ -176,18 +242,16 @@ class GameOne extends PIXI.Container
                     break;
 
                     case this.drawBtn:
-                        this.canDraw = (this.canDraw == 'normal') ? false : 'normal';
-                        this.drawBtn.text.text = this.canDraw ? 'Lock Draw' : 'Unlock Draw';
-                        this.setChildIndex(this.background, (this.canDraw == 'normal') ? true : false);
+                    case this.drawBezier:
+                        this._ToggleDraw(e.target);
                     break;
 
                     case this.sprite:
                         this.isTouch = true;
-                        this.startX = e.data.global.x;
-                        this.startY = e.data.global.y;
+                        this._SetStartPoint(e.data.global);
                     break;
 
-                    case this.background:
+                    case this.foreground:
                         switch (this.canDraw)
                         {
                             case 'normal':
@@ -197,37 +261,34 @@ class GameOne extends PIXI.Container
                             case 'bezier':
                                 if (this.tempP1)
                                 {
-                                    this.tempP2 = {x: e.data.global.x, y: e.data.global.y}
-                                    this._DrawPointOnMap(this.tempP2.x, this.tempP2.y, 'bezier');
-                                    const dist = Utils.Distance2Point(this.tempP1, this.tempP2);
-                                    const angle = Utils.Angle2Point(this.tempP1, this.tempP2);
-                                    let controlA = {x: this.tempP1.x + Math.cos(angle)*dist/3,
-                                                    y: this.tempP1.y + Math.sin(angle)*dist/3};
-                                    let controlB = {x: this.tempP1.x + Math.cos(angle)*2*dist/3,
-                                                    y: this.tempP1.y + Math.sin(angle)*2*dist/3};
-                                    this._DrawPointOnMap(controlA.x, controlA.y, 'bezier');
-                                    this._DrawPointOnMap(controlB.x, controlB.y, 'bezier');
-                                    let bezier = new Bezier();
-                                    bezier.Init([this.tempP1,controlA,controlB,this.tempP2])
-                                    this.points.push(bezier);
-                                    this.background.addChild(bezier);
-                                    console.log(bezier);
-                                    this.tempP1 = null;
-                                    this.tempP2 = null;
-                                    console.log(dist);
+                                    this.tempP2 = {x: e.data.global.x, y: e.data.global.y};
+                                    let cP = this._GetControlPoint(this.tempP1, this.tempP2);
+
+                                    this.tempBezier.DrawPointOnMap(cP[0]);
+                                    this.tempBezier.DrawPointOnMap(cP[1]);
+                                    this.tempBezier.DrawPointOnMap(this.tempP2);
+                                    
+                                    this.tempBezier.Init([this.tempP1,cP[0],cP[1],this.tempP2])
+
+                                    this.points.push(this.tempBezier);
+
+                                    this._ResetTempValue();
                                 }
                                 else
                                 {
+                                    let bezier = new Bezier();
+                                    this.foreground.addChild(bezier);
+                                    this.tempBezier = bezier;
                                     this.tempP1 = {x: e.data.global.x, y: e.data.global.y};
-                                    this._DrawPointOnMap(this.tempP1.x, this.tempP1.y,'bezier');
+                                    bezier.DrawPointOnMap(this.tempP1);
                                 }
                             break;
                         }
                     break;
 
                     case this.rmPointBtn:
-                        this.background.removeChild(this.selectedPoint);
-                        this.points.splice(this.selectedPoint, 1);
+                        this.foreground.removeChild(this.selectedPoint);
+                        this.points.splice(this.points.indexOf(this.selectedPoint), 1);
                         this.selectedPoint = null;
                         this.rmPointBtn.visible = false;
                         // console.log(this.points);
@@ -236,14 +297,8 @@ class GameOne extends PIXI.Container
                     case this.rmAllPoint:
                         this.tempP1 = null;
                         this.tempP2 = null;
-                        this.background.removeChildren();
+                        this.foreground.removeChildren();
                         this.points = [];
-                    break;
-
-                    case this.drawBezier:
-                        this.canDraw = (this.canDraw == 'bezier') ? false : 'bezier';
-                        this.drawBezier.text.text = this.canDraw ? 'Lock DrawB' : 'Unlock DrawB';
-                        this.setChildIndex(this.background, (this.canDraw == 'bezier') ? true : false);
                     break;
 
                     case this.exportBtn:
@@ -265,15 +320,33 @@ class GameOne extends PIXI.Container
                     break;
 
                     default:
+                        // console.log();
+                        this.rmPointBtn.visible = false;
                         for (let i = 0; i< this.points.length; i++)
                         {
                             let point = this.points[i];
-                            if (e.target.x == point.x &&
-                                e.target.y == point.y)
+                            if (!(point instanceof Bezier))
                             {
-                                this.selectedPoint = e.target;
-                                this.rmPointBtn.visible = true;
-                                break;
+                                if (e.target.x == point.x &&
+                                    e.target.y == point.y)
+                                {
+                                    this._SetCurrentPoint(point);
+                                    this._SetStartPoint(e.data.global);
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                for (let j = 0; j< point.arrP.length; j++)
+                                {
+                                    if (e.target.x == point.arrP[j].x &&
+                                        e.target.y == point.arrP[j].y)
+                                    {
+                                        this._SetCurrentPoint(point.arrP[j]);
+                                        this._SetStartPoint(e.data.global);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     break;
@@ -282,24 +355,45 @@ class GameOne extends PIXI.Container
 
             case 'pointermove':
                 // console.log('pointer move');
-                this.coordText.text = `${e.data.global.x.toFixed(3)}, ${e.data.global.y.toFixed(3)}`;
-                if (this.isTouch && !this.lockMove)
+                if (e.data.global.x < APP.GetWidth() && e.data.global.y < APP.GetHeight())
                 {
+                    this.coordText.text = `${e.data.global.x.toFixed(3)}, ${e.data.global.y.toFixed(3)}`;
                     let dX = e.data.global.x - this.startX;
                     let dY = e.data.global.y - this.startY;
                     this.startX += dX;
                     this.startY += dY;
-                    
-                    this.sprite.x += dX;
-                    this.sprite.y += dY;
-                    this.MovePoint(dX, dY);
+                    if (this.isTouch && !this.lockMove)
+                    {
+                        this.sprite.x += dX;
+                        this.sprite.y += dY;
+                        this.MovePoint(dX, dY);
+                    }
+                    if (this.selectedPoint)
+                    {
+                        this.selectedPoint.x += dX;
+                        this.selectedPoint.y += dY;
+                        // console.log(this.selectedPoint.x);
+                    }
                 }
             break;
 
             case 'pointerup':
                 this.isTouch = false;
+                if (this.selectedPoint)
+                {
+                    this.selectedPoint = null;
+                    this.rmPointBtn.visible = false;
+                }
             break;
         }
+        // for (let i = 0; i< this.points.length; i++)
+        // {
+        //     let point = this.points[i];
+        //     if (point instanceof Bezier)
+        //     {
+        //         point.TouchHandler(e);
+        //     }
+        // }
     }
 }
 

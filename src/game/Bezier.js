@@ -9,11 +9,12 @@ class Bezier extends PIXI.Container
     Init(arrP)
     {
         this.mGraph = new PIXI.Graphics();
-        this._DrawBezier(arrP);
+        this._DrawBezier(this.arrP);
         this.mGraph.position.set(arrP[0].x, arrP[0].y)
         this.addChild(this.mGraph);
 
-        this.arrP = arrP;
+        // this.arrP = arrP;
+        this.isTouch = false;
     }
 
     Update(dt)
@@ -23,9 +24,19 @@ class Bezier extends PIXI.Container
         this._UpdatePoint();
     }
 
+    DrawPointOnMap(p)
+    {
+        let point = Utils.DrawCircle(0,0,4);
+        point.position.set(p.x, p.y);
+        point.interactive = true;
+        point.hitArea = PIXI.Rectangle(0,0,4,4);
+        this.arrP.push(point);
+        this.addChild(point);
+    }
+
     _DrawBezier(arrP)
     {
-        this.mGraph.lineStyle(2,0xffffff);
+        this.mGraph.lineStyle(2,0xf44242);
         this.mGraph.moveTo(0,0);
         this.mGraph.bezierCurveTo(  arrP[1].x - arrP[0].x, arrP[1].y - arrP[0].y, 
                                     arrP[2].x - arrP[0].x, arrP[2].y - arrP[0].y, 
