@@ -1,3 +1,5 @@
+const Bezier                = require('./Bezier');
+
 class GameOne extends PIXI.Container
 {
     constructor()
@@ -35,6 +37,13 @@ class GameOne extends PIXI.Container
     {
         // console.log('Updating ' + dt);
         // this.sortChildren();
+        for (let i = 0; i< this.points.length; i++)
+        {
+            if (this.points[i] instanceof Bezier)
+            {
+                this.points[i].Update(dt);
+            }
+        }
     }
 
     AddGUI()
@@ -198,8 +207,8 @@ class GameOne extends PIXI.Container
                                                     y: this.tempP1.y + Math.sin(angle)*2*dist/3};
                                     this._DrawPointOnMap(controlA.x, controlA.y, 'bezier');
                                     this._DrawPointOnMap(controlB.x, controlB.y, 'bezier');
-                                    let bezier = Utils.DrawBezier([this.tempP1,controlA,controlB,this.tempP2]);
-                                    bezier.position.set(this.tempP1.x, this.tempP1.y);
+                                    let bezier = new Bezier();
+                                    bezier.Init([this.tempP1,controlA,controlB,this.tempP2])
                                     this.points.push(bezier);
                                     this.background.addChild(bezier);
                                     console.log(bezier);

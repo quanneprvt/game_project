@@ -32,12 +32,9 @@ class Utils
         let graph = new PIXI.Graphics();
         graph.lineStyle(2,0xffffff);
         graph.moveTo(0,0);
-        for (let i =1 ; i< arrP.length; i++)
-        {
-            arrP[i].x -= arrP[0].x;
-            arrP[i].y -= arrP[0].y;
-        }
-        graph.bezierCurveTo(arrP[1].x, arrP[1].y,arrP[2].x, arrP[2].y,arrP[3].x, arrP[3].y);
+        graph.bezierCurveTo(arrP[1].x - arrP[0].x, arrP[1].y - arrP[0].y, 
+                            arrP[2].x - arrP[0].x, arrP[2].y - arrP[0].y, 
+                            arrP[3].x - arrP[0].x, arrP[3].y - arrP[0].y);
         return graph;
     }
 }
