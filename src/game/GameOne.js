@@ -111,29 +111,20 @@ class GameOne extends PIXI.Container
         this.coordText.anchor.set(0.5,0.5);
         this.coordText.position.set(APP.GetWidth()-60, APP.GetHeight() - 0.5*this.coordText.height)
 
-        this.AddText(this.scaleUpBtn, 'Scale Up', style)
-        this.AddText(this.scaleDownBtn, 'Scale Down', style)
-        this.AddText(this.lockMoveBtn, 'Lock Move', style)
-        this.AddText(this.drawBtn, 'Start Draw', style)
-        this.AddText(this.rmPointBtn, 'Remove Point', style)
-        this.AddText(this.rmAllPoint, 'Remove All', style)
-        this.AddText(this.exportBtn, 'Export Vertices', style)
-        this.AddText(this.fullScr, 'Full Sprite', style)
-        this.AddText(this.drawBezier, 'Draw Bezier', style)
-        this.AddText(this.loadSpriteBtn, 'Load Sprite', style)
+        Utils.AddText(this.scaleUpBtn, 'Scale Up', style)
+        Utils.AddText(this.scaleDownBtn, 'Scale Down', style)
+        Utils.AddText(this.lockMoveBtn, 'Lock Move', style)
+        Utils.AddText(this.drawBtn, 'Start Draw', style)
+        Utils.AddText(this.rmPointBtn, 'Remove Point', style)
+        Utils.AddText(this.rmAllPoint, 'Remove All', style)
+        Utils.AddText(this.exportBtn, 'Export Vertices', style)
+        Utils.AddText(this.fullScr, 'Full Sprite', style)
+        Utils.AddText(this.drawBezier, 'Draw Bezier', style)
+        Utils.AddText(this.loadSpriteBtn, 'Load Sprite', style)
 
         this.gui = [this.scaleUpBtn,this.scaleDownBtn, this.lockMoveBtn, this.drawBtn, 
                     this.rmPointBtn, this.rmAllPoint, this.exportBtn, this.coordText,
                     this.drawBezier,this.fullScr];
-    }
-
-    AddText(obj,text,style)
-    {
-        obj.text = new PIXI.Text(text,style);
-        obj.text.anchor.set(0.5,0.5);
-        obj.text.x += 0.5*obj.width;
-        obj.text.y += 0.5*obj.height;
-        obj.addChild(obj.text);
     }
 
     MovePoint(dX, dY)

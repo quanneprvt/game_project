@@ -5,6 +5,15 @@ class Utils
 
     }
 
+    AddText(obj,text,style)
+    {
+        obj.text = new PIXI.Text(text,style);
+        obj.text.anchor.set(0.5,0.5);
+        obj.text.x += 0.5*obj.width;
+        obj.text.y += 0.5*obj.height;
+        obj.addChild(obj.text);
+    }
+
     Distance2Point(p1, p2)
     {
         let a = p1.x - p2.x;

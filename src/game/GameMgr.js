@@ -1,4 +1,5 @@
 const GameOne           = require('./GameOne');
+const GameTwo           = require('./GameTwo');
 
 class GameMgr extends PIXI.Application
 {
@@ -17,23 +18,21 @@ class GameMgr extends PIXI.Application
                 this.Init();
             })
         this.Game = [];
+        this.gui = [];
+        this.gameMenu = new PIXI.Container();
     }
 
     Init()
     {
-        this.Game.push(GameOne);
-        for (let i = 0; i< this.Game.length; i++)
-        {
-            this.Game[i].Init();
-            this.stage.addChild(this.Game[i]);
-        }
-
         // Listen for frame updates
         this.ticker.add(() => {
             let deltaTime = this.ticker.elapsedMS/1000;
-            // each frame we spin the bunny around a bit
             this.Update(deltaTime);
         });
+
+        this.AddGUI();
+        this.gameMenu.position.set(0.5*APP.GetWidth() - 0.5*this.gameMenu.width, 0.5*APP.GetHeight() - 0.5*this.gameMenu.height);
+        this.stage.addChild(this.gameMenu);
     }
 
     Update(dt)
@@ -42,6 +41,38 @@ class GameMgr extends PIXI.Application
         {
             this.Game[i].Update(dt);
         }
+    }
+
+    AddGUI()
+    {
+        let style = {
+            fontFamily : 'MainFont', 
+            fontSize: 15,
+            fill : 0xffffff, 
+            align : 'center',
+        };
+
+        let spaceY = 50;
+
+        this.menuText = new PIXI.Text('Game Menu', style);
+        
+        this.menuText.position.set(0.3*this.menuText.width, 0.5*this.menuText.height);
+
+        this.gameOneBtn = new PIXI.Sprite(Resources.button.texture);
+        this.gameOneBtn.SetTouchable(true);
+        this.gameOneBtn.y += spaceY;
+        this.gameOneBtn.on('pointerdown', this.TouchHandler.bind(this))
+
+        this.gameTwoBtn = new PIXI.Sprite(Resources.button.texture);
+        this.gameTwoBtn.SetTouchable(true);
+        this.gameTwoBtn.y = this.gameOneBtn.y + spaceY;
+        this.gameTwoBtn.on('pointerdown', this.TouchHandler.bind(this))
+
+        Utils.AddText(this.gameOneBtn, 'Game One', style);
+        Utils.AddText(this.gameTwoBtn, 'Game Two', style);
+
+        this.gui = [this.menuText, this.gameOneBtn, this.gameTwoBtn];
+        this.gameMenu.addChild(...this.gui);
     }
 
     GetWidth()
@@ -57,6 +88,31 @@ class GameMgr extends PIXI.Application
     IsLandscape()
     {
         return this.height/this.width > 1;
+    }
+
+    TouchHandler(e)
+    {
+        switch (e.type)
+        {
+            case 'pointerdown':
+                switch (e.target)
+                {
+                    case this.gameOneBtn:
+                        this.Game.push(GameOne);
+                        GameOne.Init();
+                        this.stage.removeChild(this.gameMenu);
+                        this.stage.addChild(GameOne);
+                    break;
+
+                    case this.gameTwoBtn:
+                        this.Game.push(GameTwo);
+                        GameTwo.Init();
+                        this.stage.removeChild(this.gameMenu);
+                        this.stage.addChild(GameTwo);
+                    break;
+                }
+            break;
+        }
     }
 }
 
