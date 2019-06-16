@@ -49,15 +49,17 @@ class GameOne extends PIXI.Container
 
     AddGUI()
     {
-        this.scaleUpBtn = new PIXI.Sprite(Resources.button.texture);
-        this.scaleUpBtn.SetTouchable(true);
-        this.scaleUpBtn.on('pointerdown', this.TouchHandler.bind(this))
         let style = {
             fontFamily : 'MainFont', 
             fontSize: 15,
             fill : 0xffffff, 
             align : 'center',
         };
+
+        this.scaleUpBtn = new PIXI.Sprite(Resources.button.texture);
+        this.scaleUpBtn.SetTouchable(true);
+        this.scaleUpBtn.on('pointerdown', this.TouchHandler.bind(this))
+        
         this.scaleDownBtn = new PIXI.Sprite(Resources.button.texture);
         this.scaleDownBtn.SetTouchable(true);
         this.scaleDownBtn.x += this.scaleUpBtn.width;
@@ -99,6 +101,12 @@ class GameOne extends PIXI.Container
         this.fullScr.y = this.fullScr.y + this.drawBtn.height;
         this.fullScr.on('pointerdown', this.TouchHandler.bind(this));
 
+        this.loadSpriteBtn = new PIXI.Sprite(Resources.button.texture);
+        this.loadSpriteBtn.SetTouchable(true);
+        this.loadSpriteBtn.y = this.loadSpriteBtn.y + this.drawBtn.height;
+        this.loadSpriteBtn.x += this.fullScr.width;
+        this.loadSpriteBtn.on('pointerdown', this.TouchHandler.bind(this))
+
         this.coordText = new PIXI.Text('', style);
         this.coordText.anchor.set(0.5,0.5);
         this.coordText.position.set(APP.GetWidth()-60, APP.GetHeight() - 0.5*this.coordText.height)
@@ -112,6 +120,7 @@ class GameOne extends PIXI.Container
         this.AddText(this.exportBtn, 'Export Vertices', style)
         this.AddText(this.fullScr, 'Full Sprite', style)
         this.AddText(this.drawBezier, 'Draw Bezier', style)
+        this.AddText(this.loadSpriteBtn, 'Load Sprite', style)
 
         this.gui = [this.scaleUpBtn,this.scaleDownBtn, this.lockMoveBtn, this.drawBtn, 
                     this.rmPointBtn, this.rmAllPoint, this.exportBtn, this.coordText,
@@ -137,6 +146,8 @@ class GameOne extends PIXI.Container
         }
     }
 
+    /********************************PRIVATE FUNCTION***************************************************/
+    /********************************DO NOT DELETE******************************************************/
     _DrawPointOnMap(x,y, type)
     {
         let graph = Utils.DrawCircle(0,0,4);
@@ -210,8 +221,10 @@ class GameOne extends PIXI.Container
     {
         this.startX = p.x;
         this.startY = p.y;
-        console.log(this.startX)
     }
+
+    /************************************************************************************/
+    /***********************************************************************************/
 
     //button handler
     TouchHandler(e)
@@ -268,7 +281,7 @@ class GameOne extends PIXI.Container
                                     this.tempBezier.DrawPointOnMap(cP[1]);
                                     this.tempBezier.DrawPointOnMap(this.tempP2);
                                     
-                                    this.tempBezier.Init([this.tempP1,cP[0],cP[1],this.tempP2])
+                                    this.tempBezier.Init()
 
                                     this.points.push(this.tempBezier);
 
@@ -307,9 +320,22 @@ class GameOne extends PIXI.Container
                         {
                             let point = {x:0, y:0};
                             // console.log(this.points[i].x,this.points[i].y);
-                            point.x = (this.points[i].x - (this.sprite.x - 0.5*this.sprite.width))/this.sprite.scale.x;
-                            point.y = (this.points[i].y - (this.sprite.y - 0.5*this.sprite.height))/this.sprite.scale.y;
-                            vertices.push(point);
+                            if (this.points[i] instanceof Bezier)
+                            {
+                                let points = this.points[i].GetVertices();
+                                    points.map(i => {
+                                        return vertices.push({
+                                            x: (i.x - (this.sprite.x - 0.5*this.sprite.width))/this.sprite.scale.x,
+                                            y: (i.y - (this.sprite.x - 0.5*this.sprite.width))/this.sprite.scale.x,
+                                        });
+                                    });
+                            }
+                            else
+                            {
+                                point.x = (this.points[i].x - (this.sprite.x - 0.5*this.sprite.width))/this.sprite.scale.x;
+                                point.y = (this.points[i].y - (this.sprite.y - 0.5*this.sprite.height))/this.sprite.scale.y;
+                                vertices.push(point);
+                            }
                         }
                         console.log(vertices);
                     break;
@@ -386,14 +412,6 @@ class GameOne extends PIXI.Container
                 }
             break;
         }
-        // for (let i = 0; i< this.points.length; i++)
-        // {
-        //     let point = this.points[i];
-        //     if (point instanceof Bezier)
-        //     {
-        //         point.TouchHandler(e);
-        //     }
-        // }
     }
 }
 

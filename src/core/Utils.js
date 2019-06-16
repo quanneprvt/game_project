@@ -37,6 +37,27 @@ class Utils
                             arrP[3].x - arrP[0].x, arrP[3].y - arrP[0].y);
         return graph;
     }
+
+    BezierPoint(t, array, i1 = 0, i2 = array.length - 1)
+    {
+        var length = i2 - i1 + 1;
+        if(length > 2)
+        {
+            return (1 - t)*this.BezierPoint(t, array, i1, i2-1) + t*this.BezierPoint(t, array, i1+1, i2);
+        }
+        else if(length >= 2)
+        {
+            return (1 - t)*array[i1] + t*array[i2];
+        }
+        else if(length >= 1)
+        {
+            return array[i1];
+        }
+        else
+        {
+            return null;
+        }
+    }
 }
 
 global.Utils = new Utils();
