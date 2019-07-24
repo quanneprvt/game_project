@@ -3,8 +3,9 @@ const GameTwo           = require('./GameTwo');
 
 class GameMgr extends PIXI.Application
 {
-    constructor(options)
+    constructor()
     {
+        let options = {antialias: true};
         super(options);
         this.width = 1000;
         this.height = 600;
@@ -119,4 +120,4 @@ class GameMgr extends PIXI.Application
     }
 }
 
-module.exports = new GameMgr({antialias: true});
+module.exports = new GameMgr();
