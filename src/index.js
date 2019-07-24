@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import './css/style.css';
 import './core/Utils';
+import './core/Timer';
 //
 import * as PIXI from 'pixi.js';
 global.PIXI = PIXI;
