@@ -39,7 +39,8 @@ class GameMgr extends PIXI.Application
     {
         for (let i = 0; i< this.Game.length; i++)
         {
-            this.Game[i].Update(dt);
+            if (this.Game[i].isInit)
+                this.Game[i].Update(dt);
         }
     }
 
@@ -100,6 +101,7 @@ class GameMgr extends PIXI.Application
                     case this.gameOneBtn:
                         this.Game.push(GameOne);
                         GameOne.Init();
+                        GameOne.isInit = true;
                         this.stage.removeChild(this.gameMenu);
                         this.stage.addChild(GameOne);
                     break;
@@ -107,6 +109,7 @@ class GameMgr extends PIXI.Application
                     case this.gameTwoBtn:
                         this.Game.push(GameTwo);
                         GameTwo.Init();
+                        GameTwo.isInit = true;
                         this.stage.removeChild(this.gameMenu);
                         this.stage.addChild(GameTwo);
                     break;

@@ -10,6 +10,7 @@ class GameOne extends PIXI.Container
     Init()
     {
         console.log('Game One Init');
+        //
         this.interactive = true;
         this.points = [];
         this.sprite = new PIXI.Sprite(Resources.bunny.texture);
@@ -37,7 +38,6 @@ class GameOne extends PIXI.Container
     Update(dt)
     {
         // console.log('Updating ' + dt);
-        // this.sortChildren();
         for (let i = 0; i< this.points.length; i++)
         {
             if (this.points[i] instanceof Bezier)

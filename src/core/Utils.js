@@ -36,17 +36,6 @@ class Utils
         return graph;
     }
 
-    DrawBezier(arrP)
-    {
-        let graph = new PIXI.Graphics();
-        graph.lineStyle(2,0xffffff);
-        graph.moveTo(0,0);
-        graph.bezierCurveTo(arrP[1].x - arrP[0].x, arrP[1].y - arrP[0].y, 
-                            arrP[2].x - arrP[0].x, arrP[2].y - arrP[0].y, 
-                            arrP[3].x - arrP[0].x, arrP[3].y - arrP[0].y);
-        return graph;
-    }
-
     BezierPoint(t, array, i1 = 0, i2 = array.length - 1)
     {
         var length = i2 - i1 + 1;
@@ -66,6 +55,20 @@ class Utils
         {
             return null;
         }
+    }
+
+    Rand(min, max)
+    {
+        if (min > max)
+            [min, max] = [max, min];
+        return (Math.random() * (max - min)) + min;
+    }
+
+    RandInt(min, max)
+    {
+        if (min > max)
+            [min, max] = [max, min];
+        return Math.floor((Math.random() * (max - min + 1)) + min);
     }
 }
 

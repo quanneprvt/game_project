@@ -1,8 +1,12 @@
 import _ from 'lodash';
 import './css/style.css';
 import './core/Utils';
+//
 import * as PIXI from 'pixi.js';
 global.PIXI = PIXI;
+//
+global.Matter = require('./libs/matter.min.js');
+//
 const Overwrite = require('./core/Overwrite');
 const GameMgr = require('./game/GameMgr');
 global.APP = GameMgr;
