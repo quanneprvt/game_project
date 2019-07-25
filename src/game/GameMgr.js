@@ -19,15 +19,9 @@ class GameMgr extends PIXI.Application
             .add('spriteData', 'assets/json/sprite.json')
             .add('button', 'assets/image/button.png')
             .add('MainFont', 'font/RobotoCondensed.ttf')
-            .on('progress', (loader, resource) =>{
-                Utils.Log("Loading: " + resource.name);
-                Utils.Log("Loading Progress: " + loader.progress + "%");
-                Utils.RevokeObjectURL(resource.url);
-            })
-            .load((loader, resources) => {
-                global.Resources = resources;
-                this.Init();
-            });
+            .on('progress', this.LoadProgressHandler)
+            .on('error', this.LoadErrorHandler)
+            .load(this.LoadCompleteHandler.bind(this));
         //
         this.Game = [];
         this.gui = [];
@@ -101,6 +95,24 @@ class GameMgr extends PIXI.Application
     IsLandscape()
     {
         return this.height/this.width > 1;
+    }
+
+    LoadProgressHandler(loader, resource)
+    {
+        Utils.Log("Loading: " + resource.name);
+        Utils.Log("Loading Progress: " + loader.progress + "%");
+        Utils.RevokeObjectURL(resource.url);
+    }
+
+    LoadErrorHandler(error)
+    {
+        Utils.Log("Loading " + error);
+    }
+
+    LoadCompleteHandler(loader, resources)
+    {
+        global.Resources = resources;
+        this.Init();
     }
 
     TouchHandler(e)
