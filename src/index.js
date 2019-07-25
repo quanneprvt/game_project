@@ -3,25 +3,25 @@ import './css/style.css';
 import './core/Utils';
 import './core/Timer';
 //
-import * as PIXI from 'pixi.js';
-global.PIXI = PIXI;
-//
-global.Matter = require('./libs/matter.min.js');
-//
-const Overwrite = require('./core/Overwrite');
-const GameMgr = require('./game/GameMgr');
-global.APP = GameMgr;
+global.PIXI             = require('pixi.js');
+global.Matter           = require('./libs/matter.min.js');
+global.Overwrite        = require('./core/Overwrite');
+global.APP              = require('./game/GameMgr');
 
 function component() {
-    const element = document.createElement('div');
+    const element = document.createElement('button');
   
     // Lodash, currently included via a script, is required for this line to work
     // element.innerHTML = _.join(['Hello', 'webpack'], ' ');
-    // element.classList.add('hello');
+    element.innerHTML = 'Reload';
+    element.onclick = function(){
+        location.reload();
+    };
+    element.classList.add('reload_btn');
     // GameMgr.Init();
   
     return element;
 }
   
 document.body.appendChild(component());
-document.body.appendChild(GameMgr.view);
+document.body.appendChild(APP.view);

@@ -328,7 +328,8 @@ class GameOne extends PIXI.Container
                                 vertices.push(point);
                             }
                         }
-                        console.log(vertices);
+                        // console.log(vertices);
+                        Utils.SaveFile(JSON.stringify({vertices: vertices}), 'SpriteData.json', 'application/json');
                     break;
 
                     case this.fullScr:

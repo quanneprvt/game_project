@@ -70,6 +70,15 @@ class Utils
             [min, max] = [max, min];
         return Math.floor((Math.random() * (max - min + 1)) + min);
     }
+
+    SaveFile(content, fileName, contentType)
+    {
+        let a = document.createElement("a");
+        let file = new Blob([content], {type: contentType});
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+    }
 }
 
 global.Utils = new Utils();

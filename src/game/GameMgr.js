@@ -5,14 +5,18 @@ class GameMgr extends PIXI.Application
 {
     constructor()
     {
-        let options = {antialias: true};
+        let options = {
+            antialias: true,
+            resolution: 1
+        };
         super(options);
         this.width = 1000;
         this.height = 600;
         this.renderer.resize(this.width, this.height);
         this.loader
-            .add('bunny','assets/bunny.png')
-            .add('button', 'assets/button.png')
+            .add('bunny','assets/image/bunny.png')
+            .add('spriteData', 'assets/json/sprite.json')
+            .add('button', 'assets/image/button.png')
             .add('MainFont', 'font/RobotoCondensed.ttf')
             .load((load, resources) => {
                 global.Resources = resources;
@@ -58,7 +62,7 @@ class GameMgr extends PIXI.Application
 
         this.menuText = new PIXI.Text('Game Menu', style);
         
-        this.menuText.position.set(0.3*this.menuText.width, 0.5*this.menuText.height);
+        this.menuText.position.set(0.45*this.menuText.width, 0.5*this.menuText.height);
 
         this.gameOneBtn = new PIXI.Sprite(Resources.button.texture);
         this.gameOneBtn.SetTouchable(true);
@@ -70,8 +74,8 @@ class GameMgr extends PIXI.Application
         this.gameTwoBtn.y = this.gameOneBtn.y + spaceY;
         this.gameTwoBtn.on('pointerdown', this.TouchHandler.bind(this))
 
-        Utils.AddText(this.gameOneBtn, 'Game One', style);
-        Utils.AddText(this.gameTwoBtn, 'Game Two', style);
+        Utils.AddText(this.gameOneBtn, 'Game 1', style);
+        Utils.AddText(this.gameTwoBtn, 'Game 2', style);
 
         this.gui = [this.menuText, this.gameOneBtn, this.gameTwoBtn];
         this.gameMenu.addChild(...this.gui);
