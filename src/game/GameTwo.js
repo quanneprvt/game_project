@@ -7,18 +7,8 @@ class SpriteObject
 
     Init()
     {
-        // this.sprite = new PIXI.Sprite(this._CreateTexture());
         this.sprite = new PIXI.Sprite(Resources.bunny.texture);
         this.sprite.anchor.set(0.5);
-    }
-
-    _CreateTexture()
-    {
-        let shape = new PIXI.Graphics();
-        shape.beginFill(0xCC5533);
-        shape.lineStyle(1, 0xFFFFFF);
-        shape.drawRect(0, 0, 40, 40);
-        return APP.renderer.generateTexture(shape);
     }
 }
 

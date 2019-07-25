@@ -5,6 +5,20 @@ class Utils
 
     }
 
+    Log(...texts)
+    {
+        console.log.apply(this, texts);
+    }
+
+    RevokeObjectURL(link)
+    {
+        if (link.startsWith('blob:'))
+        {
+            const Url = window.URL || window.webkitURL;
+            Url.revokeObjectURL(link);
+        }
+    }
+
     AddText(obj,text,style)
     {
         obj.text = new PIXI.Text(text,style);

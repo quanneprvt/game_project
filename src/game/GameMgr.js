@@ -13,15 +13,22 @@ class GameMgr extends PIXI.Application
         this.width = 1000;
         this.height = 600;
         this.renderer.resize(this.width, this.height);
+        //
         this.loader
             .add('bunny','assets/image/bunny.png')
             .add('spriteData', 'assets/json/sprite.json')
             .add('button', 'assets/image/button.png')
             .add('MainFont', 'font/RobotoCondensed.ttf')
-            .load((load, resources) => {
+            .on('progress', (loader, resource) =>{
+                Utils.Log("Loading: " + resource.name);
+                Utils.Log("Loading Progress: " + loader.progress + "%");
+                Utils.RevokeObjectURL(resource.url);
+            })
+            .load((loader, resources) => {
                 global.Resources = resources;
                 this.Init();
-            })
+            });
+        //
         this.Game = [];
         this.gui = [];
         this.gameMenu = new PIXI.Container();
